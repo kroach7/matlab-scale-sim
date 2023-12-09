@@ -11,11 +11,9 @@ waveDisturbance = waveAmplitude * sin(2 * pi * waveFrequency * time);
 randomDisturbance = randn(size(time)); % Random noise
 totalDisturbance = waveDisturbance + randomDisturbance;
 
-% Modify Scale Readings to Simulate Adding Fish
+% Simulate Fish
 addFishTime = 50; % Time to add fish in seconds
 fishWeight = 10; % Weight of the fish in kg
-scaleReading = baselineWeight + totalDisturbance; % Initial scale reading
-scaleReading(time >= addFishTime) = scaleReading(time >= addFishTime) + fishWeight;
 
 % Initialize Moving Average Filter
 windowSize = 50; % Number of readings in the moving average window
@@ -30,6 +28,11 @@ stabilizationTime = 0;
 
 % Perform Moving Average Calculations and Fish Detection
 for i = 1:length(time)
+    scaleReading(i) = baselineWeight + totalDisturbance(i);
+    if(time(i) >= addFishTime )
+        scaleReading(i) = scaleReading(i) + fishWeight;
+    end
+
     sumReadings = sumReadings + scaleReading(i);
     if i > windowSize
         sumReadings = sumReadings - scaleReading(i - windowSize);
